@@ -34,7 +34,7 @@ use ruff_linter::settings::{
 use ruff_linter::{
     fs, warn_user, warn_user_once, warn_user_once_by_id, RuleSelector, RUFF_PKG_VERSION,
 };
-use ruff_python_formatter::{MagicTrailingComma, QuoteStyle};
+use ruff_python_formatter::{DocstringCode, MagicTrailingComma, QuoteStyle};
 
 use crate::options::{
     Flake8AnnotationsOptions, Flake8BanditOptions, Flake8BugbearOptions, Flake8BuiltinsOptions,
@@ -180,6 +180,9 @@ impl Configuration {
             magic_trailing_comma: format
                 .magic_trailing_comma
                 .unwrap_or(format_defaults.magic_trailing_comma),
+            format_code_in_docstrings: format
+                .format_code_in_docstrings
+                .unwrap_or(format_defaults.format_code_in_docstrings),
         };
 
         let lint = self.lint;
@@ -1011,6 +1014,7 @@ pub struct FormatConfiguration {
     pub quote_style: Option<QuoteStyle>,
     pub magic_trailing_comma: Option<MagicTrailingComma>,
     pub line_ending: Option<LineEnding>,
+    pub format_code_in_docstrings: Option<DocstringCode>,
 }
 
 impl FormatConfiguration {
@@ -1037,6 +1041,13 @@ impl FormatConfiguration {
                 }
             }),
             line_ending: options.line_ending,
+            format_code_in_docstrings: options.format_code_in_docstrings.map(|yes| {
+                if yes {
+                    DocstringCode::Enabled
+                } else {
+                    DocstringCode::Disabled
+                }
+            }),
         })
     }
 
@@ -1050,6 +1061,9 @@ impl FormatConfiguration {
             quote_style: self.quote_style.or(other.quote_style),
             magic_trailing_comma: self.magic_trailing_comma.or(other.magic_trailing_comma),
             line_ending: self.line_ending.or(other.line_ending),
+            format_code_in_docstrings: self
+                .format_code_in_docstrings
+                .or(other.format_code_in_docstrings),
         }
     }
 }

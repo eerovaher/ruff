@@ -1251,6 +1251,13 @@
             "type": "string"
           }
         },
+        "format-code-in-docstrings": {
+          "description": "Whether to format code snippets in docstrings.\n\nWhen this is enabled, Python code in the format of doctests within docstrings is automatically reformatted.\n\nFor example, when this is enabled, the following code:\n\n```python def f(x): \"\"\" Something about `f`. And an example:\n\n>>> f(  x  ) \"\"\" pass ```\n\nwill be reformatted (assuming the rest of the options are set to their defaults) as:\n\n```python def f(x): \"\"\" Something about `f`. And an example:\n\n>>> f(x) \"\"\" pass ```\n\nIf a doctest contains invalid Python code or if the formatter would otherwise write invalid Python code, then the doctest is ignored by the formatter and kept as-is.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "indent-style": {
           "description": "Whether to use spaces or tabs for indentation.\n\n`indent-style = \"space\"` (default):\n\n```python def f(): print(\"Hello\") #  Spaces indent the `print` statement. ```\n\n`indent-style = \"tab\"\"`:\n\n```python def f(): print(\"Hello\") #  A tab `\\t` indents the `print` statement. ```\n\nPEP 8 recommends using spaces for [indentation](https://peps.python.org/pep-0008/#indentation). We care about accessibility; if you do not need tabs for accessibility, we do not recommend you use them.\n\nSee [`indent-width`](#indent-width) to configure the number of spaces per indentation and the tab width.",
           "anyOf": [
