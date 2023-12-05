@@ -4,7 +4,6 @@ use ruff_python_literal::cformat::{CFormatError, CFormatErrorType};
 use ruff_diagnostics::Diagnostic;
 
 use ruff_python_ast::types::Node;
-use ruff_python_ast::AstNode;
 use ruff_python_semantic::analyze::typing;
 use ruff_python_semantic::ScopeKind;
 use ruff_text_size::Ranged;
@@ -1009,25 +1008,14 @@ pub(crate) fn expression(expr: &Expr, checker: &mut Checker) {
             }
             for literal in value.elements().filter_map(|element| element.as_literal()) {
                 if checker.enabled(Rule::HardcodedBindAllInterfaces) {
-                    flake8_bandit::rules::hardcoded_bind_all_interfaces(
-                        checker,
-                        &literal.value,
-                        literal.range,
-                    );
+                    flake8_bandit::rules::hardcoded_bind_all_interfaces(checker, literal.into());
                 }
                 if checker.enabled(Rule::HardcodedTempFile) {
-                    flake8_bandit::rules::hardcoded_tmp_directory(
-                        checker,
-                        &literal.value,
-                        literal.range,
-                    );
+                    flake8_bandit::rules::hardcoded_tmp_directory(checker, literal.into());
                 }
                 if checker.source_type.is_stub() {
                     if checker.enabled(Rule::StringOrBytesTooLong) {
-                        flake8_pyi::rules::string_or_bytes_too_long(
-                            checker,
-                            literal.as_any_node_ref(),
-                        );
+                        flake8_pyi::rules::string_or_bytes_too_long(checker, literal.into());
                     }
                 }
             }
@@ -1297,22 +1285,15 @@ pub(crate) fn expression(expr: &Expr, checker: &mut Checker) {
         }
         Expr::BytesLiteral(bytes_literal) => {
             if checker.source_type.is_stub() && checker.enabled(Rule::StringOrBytesTooLong) {
-                flake8_pyi::rules::string_or_bytes_too_long(
-                    checker,
-                    bytes_literal.as_any_node_ref(),
-                );
+                flake8_pyi::rules::string_or_bytes_too_long(checker, bytes_literal.into());
             }
         }
-        Expr::StringLiteral(string_literal @ ast::ExprStringLiteral { value, range }) => {
+        Expr::StringLiteral(string_literal @ ast::ExprStringLiteral { value, .. }) => {
             if checker.enabled(Rule::HardcodedBindAllInterfaces) {
-                flake8_bandit::rules::hardcoded_bind_all_interfaces(
-                    checker,
-                    value.to_str(),
-                    *range,
-                );
+                flake8_bandit::rules::hardcoded_bind_all_interfaces(checker, string_literal.into());
             }
             if checker.enabled(Rule::HardcodedTempFile) {
-                flake8_bandit::rules::hardcoded_tmp_directory(checker, value.to_str(), *range);
+                flake8_bandit::rules::hardcoded_tmp_directory(checker, string_literal.into());
             }
             if checker.enabled(Rule::UnicodeKindPrefix) {
                 for string_part in value.parts() {
@@ -1321,10 +1302,7 @@ pub(crate) fn expression(expr: &Expr, checker: &mut Checker) {
             }
             if checker.source_type.is_stub() {
                 if checker.enabled(Rule::StringOrBytesTooLong) {
-                    flake8_pyi::rules::string_or_bytes_too_long(
-                        checker,
-                        string_literal.as_any_node_ref(),
-                    );
+                    flake8_pyi::rules::string_or_bytes_too_long(checker, string_literal.into());
                 }
             }
         }
