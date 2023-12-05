@@ -1007,23 +1007,26 @@ pub(crate) fn expression(expr: &Expr, checker: &mut Checker) {
                     pyupgrade::rules::unicode_kind_prefix(checker, string_literal);
                 }
             }
-            for element in value.elements() {
-                let Some(literal_element @ ast::FStringLiteralElement { value, range }) =
-                    element.as_literal()
-                else {
-                    continue;
-                };
+            for literal in value.elements().filter_map(|element| element.as_literal()) {
                 if checker.enabled(Rule::HardcodedBindAllInterfaces) {
-                    flake8_bandit::rules::hardcoded_bind_all_interfaces(checker, value, *range);
+                    flake8_bandit::rules::hardcoded_bind_all_interfaces(
+                        checker,
+                        &literal.value,
+                        literal.range,
+                    );
                 }
                 if checker.enabled(Rule::HardcodedTempFile) {
-                    flake8_bandit::rules::hardcoded_tmp_directory(checker, value, *range);
+                    flake8_bandit::rules::hardcoded_tmp_directory(
+                        checker,
+                        &literal.value,
+                        literal.range,
+                    );
                 }
                 if checker.source_type.is_stub() {
                     if checker.enabled(Rule::StringOrBytesTooLong) {
                         flake8_pyi::rules::string_or_bytes_too_long(
                             checker,
-                            literal_element.as_any_node_ref(),
+                            literal.as_any_node_ref(),
                         );
                     }
                 }
