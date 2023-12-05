@@ -1,8 +1,8 @@
 use crate::{
     Alias, Arguments, BoolOp, BytesLiteral, CmpOp, Comprehension, Decorator, ElifElseClause,
-    ExceptHandler, Expr, FString, FStringElement, FStringExpressionElement, Keyword, MatchCase,
-    Mod, Operator, Parameter, ParameterWithDefault, Parameters, Pattern, PatternArguments,
-    PatternKeyword, Singleton, Stmt, StringLiteral, TypeParam, TypeParams, UnaryOp, WithItem,
+    ExceptHandler, Expr, FString, FStringElement, Keyword, MatchCase, Mod, Operator, Parameter,
+    ParameterWithDefault, Parameters, Pattern, PatternArguments, PatternKeyword, Singleton, Stmt,
+    StringLiteral, TypeParam, TypeParams, UnaryOp, WithItem,
 };
 use crate::{AnyNodeRef, AstNode};
 
@@ -524,18 +524,9 @@ pub fn walk_f_string_element<'a, V: PreorderVisitor<'a> + ?Sized>(
 ) {
     let node = AnyNodeRef::from(f_string_element);
     if visitor.enter_node(node).is_traverse() {
-        if let FStringElement::Expression(FStringExpressionElement {
-            expression,
-            format_spec,
-            ..
-        }) = f_string_element
-        {
-            visitor.visit_expr(expression);
-            if let Some(format_spec) = format_spec {
-                for spec_element in &format_spec.elements {
-                    visitor.visit_f_string_element(spec_element);
-                }
-            }
+        match f_string_element {
+            FStringElement::Expression(element) => element.visit_preorder(visitor),
+            FStringElement::Literal(element) => element.visit_preorder(visitor),
         }
     }
     visitor.leave_node(node);
