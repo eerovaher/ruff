@@ -957,6 +957,14 @@ impl Ranged for FStringLiteralElement {
     }
 }
 
+impl Deref for FStringLiteralElement {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        self.value.as_str()
+    }
+}
+
 /// Transforms a value prior to formatting it.
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, is_macro::Is)]
 #[repr(i8)]
